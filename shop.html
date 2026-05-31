@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Collections - LankaModern</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Browse our catalog of premium Sri Lankan clothing. Filter by linen, batik, streetwear, and find your perfect fit.">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom config for tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: '#C85A32', // Terracotta Clay
+              cinnamon: '#8D4024', // Ceylon Cinnamon
+            },
+            secondary: {
+              DEFAULT: '#0A4D42', // Tropical Monstera Green
+            },
+            accent: {
+              DEFAULT: '#F2BB16', // Marigold Gold
+            },
+            linen: '#FAF9F6', // Soft Linen/Ivory
+          },
+          fontFamily: {
+            heading: ['"Playfair Display"', 'serif'],
+            body: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Custom CSS for animation & typography -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#FAF9F6] text-gray-800 font-body min-h-screen flex flex-col">
+
+  <!-- Dynamic Header loaded here -->
+  <header id="global-header"></header>
+
+  <!-- Banner / Breadcrumbs -->
+  <div class="bg-gradient-to-r from-[#FAF9F6] to-[#FAF9F6] border-b border-gray-200 py-10 px-4 sm:px-6 lg:px-8 text-center space-y-2">
+    <span class="text-[10px] text-[#C85A32] tracking-[0.2em] font-semibold uppercase">Sri Lankan Fashion Heritage</span>
+    <h1 class="font-heading text-3xl sm:text-4xl font-bold text-[#0A4D42] tracking-wide">Shop our Collections</h1>
+    <div class="text-xs text-gray-400 font-medium">
+      <a href="index.html" class="hover:text-[#C85A32]">Home</a> &nbsp;/&nbsp; <span class="text-gray-600">Shop Catalog</span>
+    </div>
+  </div>
+
+  <!-- Shop Content Layout -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col lg:flex-row gap-10 items-start">
+      
+      <!-- 1. Filters Sidebar (Visible on Desktop, hidden on Mobile) -->
+      <aside class="hidden lg:block w-64 flex-shrink-0 bg-white border border-gray-100 rounded-xl p-6 shadow-sm sticky top-28 space-y-8">
+        <div>
+          <h2 class="font-heading text-lg font-bold text-[#0A4D42] pb-3 border-b border-gray-100 flex items-center justify-between">
+            <span>Filters</span>
+            <button onclick="clearFilters()" class="text-xs text-[#C85A32] hover:underline font-body font-medium">Clear All</button>
+          </h2>
+        </div>
+
+        <!-- Filter category -->
+        <div class="space-y-3">
+          <h3 class="font-heading font-semibold text-gray-800 text-sm">Categories</h3>
+          <div class="space-y-2 text-sm text-gray-600 font-body" id="category-filters-container">
+            <!-- Dynamic checkboxes injected -->
+          </div>
+        </div>
+
+        <!-- Filter Price -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center text-sm font-semibold text-gray-800 font-heading">
+            <h3>Max Price</h3>
+            <span class="text-[#8D4024] font-body" id="price-slider-value">Rs. 15,000</span>
+          </div>
+          <input type="range" id="price-filter" min="3000" max="15000" step="500" value="15000" oninput="updatePriceFilterValue(this.value)" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0A4D42]">
+          <div class="flex justify-between text-[10px] text-gray-400 font-medium">
+            <span>Rs. 3,000</span>
+            <span>Rs. 15,000</span>
+          </div>
+        </div>
+
+        <!-- Filter Sizes -->
+        <div class="space-y-3">
+          <h3 class="font-heading font-semibold text-gray-800 text-sm">Sizes</h3>
+          <div class="flex flex-wrap gap-2" id="size-filters-container">
+            <!-- Dynamic sizes injected -->
+          </div>
+        </div>
+
+        <!-- Filter Colors -->
+        <div class="space-y-3">
+          <h3 class="font-heading font-semibold text-gray-800 text-sm">Colors</h3>
+          <div class="flex flex-wrap gap-2.5" id="color-filters-container">
+            <!-- Dynamic colors injected -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Mobile Filters Action Bar (Hidden on Desktop) -->
+      <div class="lg:hidden w-full flex items-center justify-between gap-4 py-2.5 px-4 bg-white border border-gray-100 rounded-lg shadow-sm">
+        <button onclick="toggleMobileFilters()" class="flex-1 py-2 bg-[#0A4D42] text-white rounded text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2">
+          <span>Filter Items</span> <span>⚙️</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <label for="sort-select-mobile" class="text-xs font-medium text-gray-500 font-body">Sort:</label>
+          <select id="sort-select-mobile" onchange="updateSorting(this.value)" class="py-1.5 px-2.5 bg-[#FAF9F6] border border-gray-200 text-xs rounded text-gray-700 focus:outline-none focus:border-[#C85A32]">
+            <option value="popular">Popularity</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating">Rating</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 2. Product Grid & Header -->
+      <section class="flex-1 w-full space-y-6">
+        
+        <!-- Grid Header -->
+        <div class="hidden lg:flex items-center justify-between border-b border-gray-100 pb-4">
+          <p class="text-sm text-gray-500 font-body">Showing <span id="product-count" class="font-semibold text-gray-800">0</span> premium products</p>
+          <div class="flex items-center space-x-3">
+            <label for="sort-select" class="text-sm font-medium text-gray-500 font-body">Sort by:</label>
+            <select id="sort-select" onchange="updateSorting(this.value)" class="py-2 px-3 bg-white border border-gray-200 text-sm rounded shadow-sm text-gray-700 focus:outline-none focus:border-[#C85A32]">
+              <option value="popular">Popularity</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Rating</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Products Grid Container -->
+        <div id="shop-product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[400px]">
+          <!-- Skeleton Loading Screen -->
+          <div class="shimmer-loader h-96 rounded-xl"></div>
+          <div class="shimmer-loader h-96 rounded-xl"></div>
+          <div class="shimmer-loader h-96 rounded-xl"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Mobile Drawer for Filters -->
+  <div id="mobile-filter-drawer" class="fixed inset-0 z-50 pointer-events-none">
+    <div id="mobile-filter-backdrop" class="fixed inset-0 bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 pointer-events-none" onclick="toggleMobileFilters()"></div>
+    <div id="mobile-filter-panel" class="fixed right-0 top-0 bottom-0 w-80 bg-[#FAF9F6] shadow-2xl flex flex-col translate-x-full transition-transform duration-300 pointer-events-auto h-full z-10 p-6 space-y-6 overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+        <h2 class="font-heading text-lg font-bold text-[#0A4D42]">Filter Selection</h2>
+        <button onclick="toggleMobileFilters()" class="text-gray-400 hover:text-gray-600">✕</button>
+      </div>
+
+      <!-- Categories Mobile -->
+      <div class="space-y-3">
+        <h3 class="font-heading font-semibold text-gray-800 text-sm">Categories</h3>
+        <div class="space-y-2 text-sm text-gray-600 font-body" id="category-filters-container-mobile"></div>
+      </div>
+
+      <!-- Price Mobile -->
+      <div class="space-y-3">
+        <div class="flex justify-between items-center text-sm font-semibold text-gray-800 font-heading">
+          <h3>Max Price</h3>
+          <span class="text-[#8D4024] font-body" id="price-slider-value-mobile">Rs. 15,000</span>
+        </div>
+        <input type="range" id="price-filter-mobile" min="3000" max="15000" step="500" value="15000" oninput="updatePriceFilterValue(this.value)" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0A4D42]">
+      </div>
+
+      <!-- Sizes Mobile -->
+      <div class="space-y-3">
+        <h3 class="font-heading font-semibold text-gray-800 text-sm">Sizes</h3>
+        <div class="flex flex-wrap gap-2" id="size-filters-container-mobile"></div>
+      </div>
+
+      <!-- Colors Mobile -->
+      <div class="space-y-3">
+        <h3 class="font-heading font-semibold text-gray-800 text-sm">Colors</h3>
+        <div class="flex flex-wrap gap-2.5" id="color-filters-container-mobile"></div>
+      </div>
+
+      <div class="pt-6 border-t border-gray-200 flex gap-4">
+        <button onclick="clearFilters(); toggleMobileFilters();" class="flex-1 py-2.5 border border-gray-300 rounded text-sm text-gray-600 font-semibold btn-haptic">Clear All</button>
+        <button onclick="toggleMobileFilters()" class="flex-1 py-2.5 bg-[#0A4D42] text-white rounded text-sm font-semibold btn-haptic">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Footer loaded here -->
+  <footer id="global-footer"></footer>
+
+  <!-- Import JS Scripts -->
+  <script src="products.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Filter & Sort Page Logic -->
+  <script>
+    // State management for Filters
+    let selectedCategories = [];
+    let selectedSizes = [];
+    let selectedColors = [];
+    let maxPrice = 15000;
+    let currentSort = 'popular';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Parse Query Parameters (e.g. ?category=Batik%20Fusion)
+      const params = new URLSearchParams(window.location.search);
+      const catParam = params.get('category');
+      if (catParam) {
+        selectedCategories.push(catParam);
+      }
+
+      // Initialize layouts
+      initializeFilterUI();
+      
+      // Delay grid loading slightly to simulate premium loader feel
+      setTimeout(renderProductGrid, 600);
+    });
+
+    function initializeFilterUI() {
+      // Extract unique items from Products
+      const categories = [...new Set(PRODUCTS.map(p => p.category))];
+      const sizes = [...new Set(PRODUCTS.flatMap(p => p.sizes))].filter(s => s !== "One Size"); // Exclude sarong one-size
+      sizes.push("One Size"); // Put it back at the end
+      
+      // Extract unique colors mapped by Hex to avoid duplicates
+      const uniqueColorsMap = {};
+      PRODUCTS.flatMap(p => p.colors).forEach(c => {
+        if (!uniqueColorsMap[c.name]) {
+          uniqueColorsMap[c.name] = c;
+        }
+      });
+      const colors = Object.values(uniqueColorsMap);
+
+      // Render categories
+      const renderCategories = (containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = categories.map(cat => {
+          const isChecked = selectedCategories.includes(cat) ? 'checked' : '';
+          return `
+            <label class="flex items-center gap-2.5 cursor-pointer py-1 group">
+              <input type="checkbox" value="${cat}" ${isChecked} onchange="toggleCategoryFilter(this.value, this.checked)" class="rounded border-gray-300 text-[#0A4D42] focus:ring-[#0A4D42] w-4 h-4 cursor-pointer">
+              <span class="group-hover:text-[#C85A32] transition-colors">${cat}</span>
+            </label>
+          `;
+        }).join('');
+      };
+      renderCategories('category-filters-container');
+      renderCategories('category-filters-container-mobile');
+
+      // Render sizes
+      const renderSizes = (containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = sizes.map(size => {
+          const isSelected = selectedSizes.includes(size);
+          const activeClass = isSelected ? 'bg-[#0A4D42] text-white border-transparent' : 'bg-white border-gray-200 text-gray-700 hover:border-[#C85A32]';
+          return `
+            <button onclick="toggleSizeFilter('${size}')" class="w-10 h-10 border text-xs font-semibold rounded flex items-center justify-center font-body transition-all btn-haptic ${activeClass}">${size}</button>
+          `;
+        }).join('');
+      };
+      renderSizes('size-filters-container');
+      renderSizes('size-filters-container-mobile');
+
+      // Render colors
+      const renderColors = (containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = colors.map(col => {
+          const isSelected = selectedColors.includes(col.name);
+          const activeClass = isSelected ? 'ring-2 ring-offset-2 ring-[#0A4D42]' : 'hover:scale-110';
+          return `
+            <button onclick="toggleColorFilter('${col.name}')" class="w-6 h-6 rounded-full ${col.class} border border-gray-300 shadow-sm transition-all ${activeClass}" title="${col.name}"></button>
+          `;
+        }).join('');
+      };
+      renderColors('color-filters-container');
+      renderColors('color-filters-container-mobile');
+    }
+
+    // Interactive filter updates
+    function toggleCategoryFilter(category, isChecked) {
+      if (isChecked) {
+        selectedCategories.push(category);
+      } else {
+        selectedCategories = selectedCategories.filter(c => c !== category);
+      }
+      // Keep mobile/desktop checkboxes in sync
+      const checkboxes = document.querySelectorAll(`input[type="checkbox"][value="${category}"]`);
+      checkboxes.forEach(cb => cb.checked = isChecked);
+
+      renderProductGrid();
+    }
+
+    function toggleSizeFilter(size) {
+      if (selectedSizes.includes(size)) {
+        selectedSizes = selectedSizes.filter(s => s !== size);
+      } else {
+        selectedSizes.push(size);
+      }
+      initializeFilterUI();
+      renderProductGrid();
+    }
+
+    function toggleColorFilter(colorName) {
+      if (selectedColors.includes(colorName)) {
+        selectedColors = selectedColors.filter(c => c !== colorName);
+      } else {
+        selectedColors.push(colorName);
+      }
+      initializeFilterUI();
+      renderProductGrid();
+    }
+
+    function updatePriceFilterValue(val) {
+      maxPrice = parseInt(val);
+      document.getElementById('price-slider-value').innerText = `Rs. ${maxPrice.toLocaleString()}`;
+      document.getElementById('price-slider-value-mobile').innerText = `Rs. ${maxPrice.toLocaleString()}`;
+      
+      // Keep sliders in sync
+      document.getElementById('price-filter').value = val;
+      document.getElementById('price-filter-mobile').value = val;
+
+      renderProductGrid();
+    }
+
+    function updateSorting(val) {
+      currentSort = val;
+      // Sync dropdown selections
+      document.getElementById('sort-select').value = val;
+      document.getElementById('sort-select-mobile').value = val;
+
+      renderProductGrid();
+    }
+
+    function clearFilters() {
+      selectedCategories = [];
+      selectedSizes = [];
+      selectedColors = [];
+      maxPrice = 15000;
+      
+      // Reset DOM fields
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.checked = false);
+      
+      document.getElementById('price-filter').value = 15000;
+      document.getElementById('price-filter-mobile').value = 15000;
+      document.getElementById('price-slider-value').innerText = "Rs. 15,000";
+      document.getElementById('price-slider-value-mobile').innerText = "Rs. 15,000";
+
+      initializeFilterUI();
+      renderProductGrid();
+    }
+
+    // Toggle Mobile Filter Drawer overlay
+    function toggleMobileFilters() {
+      const panel = document.getElementById('mobile-filter-panel');
+      const backdrop = document.getElementById('mobile-filter-backdrop');
+      const container = document.getElementById('mobile-filter-drawer');
+
+      const isOpen = !panel.classList.contains('translate-x-full');
+      if (isOpen) {
+        panel.classList.add('translate-x-full');
+        backdrop.classList.add('opacity-0');
+        backdrop.classList.add('pointer-events-none');
+        setTimeout(() => container.classList.add('pointer-events-none'), 300);
+      } else {
+        container.classList.remove('pointer-events-none');
+        backdrop.classList.remove('pointer-events-none');
+        setTimeout(() => {
+          panel.classList.remove('translate-x-full');
+          backdrop.classList.remove('opacity-0');
+        }, 50);
+      }
+    }
+
+    // Render Filtered Product Grid
+    function renderProductGrid() {
+      const grid = document.getElementById('shop-product-grid');
+      const countLabel = document.getElementById('product-count');
+      if (!grid || typeof PRODUCTS === 'undefined') return;
+
+      // Filter products
+      let filtered = PRODUCTS.filter(p => {
+        // Category Filter
+        if (selectedCategories.length > 0 && !selectedCategories.includes(p.category)) {
+          return false;
+        }
+
+        // Price Filter
+        const price = p.price - (p.price * (p.discount || 0) / 100);
+        if (price > maxPrice) {
+          return false;
+        }
+
+        // Size Filter
+        if (selectedSizes.length > 0) {
+          const hasSize = p.sizes.some(s => selectedSizes.includes(s));
+          if (!hasSize) return false;
+        }
+
+        // Color Filter
+        if (selectedColors.length > 0) {
+          const hasColor = p.colors.some(c => selectedColors.includes(c.name));
+          if (!hasColor) return false;
+        }
+
+        return true;
+      });
+
+      // Sort products
+      if (currentSort === 'price-asc') {
+        filtered.sort((a, b) => {
+          const priceA = a.price - (a.price * (a.discount || 0) / 100);
+          const priceB = b.price - (b.price * (b.discount || 0) / 100);
+          return priceA - priceB;
+        });
+      } else if (currentSort === 'price-desc') {
+        filtered.sort((a, b) => {
+          const priceA = a.price - (a.price * (a.discount || 0) / 100);
+          const priceB = b.price - (b.price * (b.discount || 0) / 100);
+          return priceB - priceA;
+        });
+      } else if (currentSort === 'rating') {
+        filtered.sort((a, b) => b.rating - a.rating);
+      } else {
+        // Popular / Default (featured, rating)
+        filtered.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+      }
+
+      // Update count label
+      if (countLabel) countLabel.innerText = filtered.length;
+
+      // Check empty state
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full h-96 flex flex-col items-center justify-center text-center space-y-4">
+            <span class="text-6xl">🛶</span>
+            <div>
+              <h3 class="font-heading text-xl font-bold text-gray-800">No products found</h3>
+              <p class="font-body text-sm text-gray-500 mt-1 max-w-sm">Try widening your price range, choosing other colors/sizes, or clearing filters.</p>
+            </div>
+            <button onclick="clearFilters()" class="px-5 py-2.5 bg-[#0A4D42] text-white font-semibold rounded text-xs uppercase tracking-wider hover:bg-[#083E35] transition-colors btn-haptic shadow-md">Reset Filters</button>
+          </div>
+        `;
+        return;
+      }
+
+      // Render cards
+      grid.innerHTML = filtered.map(p => {
+        const finalPrice = p.price - (p.price * (p.discount || 0) / 100);
+        const originalPriceHTML = p.discount > 0 ? `<span class="text-xs text-gray-400 line-through">Rs. ${p.price.toLocaleString()}</span>` : '';
+        const badgeHTML = p.discount > 0 ? `<span class="absolute top-3 left-3 bg-[#C85A32] text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider z-10">Sale ${p.discount}%</span>` : '';
+        
+        return `
+          <div class="group flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative transition-all duration-300 hover:shadow-md animate-fade-in-up">
+            <!-- Image Panel -->
+            <div class="relative overflow-hidden aspect-[3/4] bg-[#FAF9F6]">
+              ${badgeHTML}
+              <a href="product.html?id=${p.id}">
+                <!-- Alternate Image Swap on Hover (Front / Back effect) -->
+                <img src="${p.images[0]}" alt="${p.name}" class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105 group-hover:opacity-0 absolute inset-0">
+                <img src="${p.images[1] || p.images[0]}" alt="${p.name} alternate view" class="w-full h-full object-cover transform scale-105 transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-100 absolute inset-0">
+              </a>
+              <!-- Quick Add Panel -->
+              <div class="absolute bottom-3 left-3 right-3 translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex gap-2">
+                <button onclick="addToCart('${p.id}', '${p.colors[0].name}', '${p.sizes[0]}', 1)" class="flex-1 py-2.5 bg-[#0A4D42] hover:bg-[#083E35] text-white text-[10px] font-semibold uppercase tracking-wider rounded shadow-md btn-haptic transition-colors flex items-center justify-center gap-1.5">
+                  <span>Quick Add</span>
+                </button>
+                <a href="product.html?id=${p.id}" class="px-3 py-2.5 bg-white text-gray-700 hover:text-[#C85A32] rounded shadow-md btn-haptic transition-colors flex items-center justify-center">
+                  👁️
+                </a>
+              </div>
+            </div>
+
+            <!-- Details -->
+            <div class="p-5 flex-1 flex flex-col justify-between space-y-2 bg-white">
+              <div class="space-y-1">
+                <span class="text-[10px] text-gray-400 tracking-wider uppercase font-semibold">${p.category}</span>
+                <a href="product.html?id=${p.id}" class="block">
+                  <h3 class="font-heading text-base font-semibold text-gray-800 hover:text-[#C85A32] transition-colors leading-snug truncate">${p.name}</h3>
+                </a>
+                <div class="flex items-center gap-1 text-[#F2BB16] text-xs">
+                  <span>★</span>
+                  <span class="text-gray-500 font-medium text-[10px]">${p.rating} (${p.reviews})</span>
+                </div>
+              </div>
+
+              <!-- Price / Color Swatches -->
+              <div class="flex items-center justify-between pt-2 border-t border-gray-50">
+                <div class="flex flex-col">
+                  ${originalPriceHTML}
+                  <span class="font-heading text-base font-bold text-[#8D4024]">Rs. ${finalPrice.toLocaleString()}.00</span>
+                </div>
+                <div class="flex gap-1">
+                  ${p.colors.map(col => `
+                    <span class="w-2.5 h-2.5 rounded-full ${col.class}" title="${col.name}"></span>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>
